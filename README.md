@@ -47,16 +47,14 @@ baseline (weak augmentation, 7.2M params), not one bad case.
 
 ![Dice distribution](docs/figures/dice_distribution.png)
 
-<!-- SAMPLES — copy sample triptychs to docs/figures/samples/ then uncomment this block
 ### Sample predictions (image / ground truth / prediction)
 
 <p align="center">
-  <img src="docs/figures/samples/sample_1.png" width="420">
-  <img src="docs/figures/samples/sample_2.png" width="420">
-  <img src="docs/figures/samples/sample_3.png" width="420">
-  <img src="docs/figures/samples/sample_4.png" width="420">
+  <img src="docs/samples/sample_1.png" width="420">
+  <img src="docs/samples/sample_2.png" width="420">
+  <img src="docs/samples/sample_3.png" width="420">
+  <img src="docs/samples/sample_4.png" width="420">
 </p>
--->
 
 ## What the engineering iterations changed
 
@@ -107,7 +105,7 @@ No data yet? Smoke-test the whole pipeline in ~1 minute on synthetic data:
 python make_dummy_data.py --out data/smoke --cases 14
 python check_msd.py --root data/smoke
 python prepare_slices.py --data_root data/smoke --out data/slices_smoke --size 64 --resize
-python train.py --prepared data/slices_smoke --size 64 --epochs 3 --batch_size 4
+python train.py --prepared data/slices_smoke --epochs 3 --batch_size 4
 ```
 
 ## Repository layout
@@ -122,7 +120,8 @@ python train.py --prepared data/slices_smoke --size 64 --epochs 3 --batch_size 4
 ├── make_figures.py       # README figures from train_log / dice CSV
 ├── make_dummy_data.py    # synthetic MSD-style data for a 1-minute smoke test
 ├── verify_extra.py       # determinism / leakage / tensor-contract checks
-└── docs/figures/         # training curves, Dice distribution, result samples
+├── docs/figures/         # training curves, Dice distribution
+└── docs/samples/         # sample prediction triptychs
 ```
 
 ## Known limitations
@@ -140,7 +139,7 @@ python train.py --prepared data/slices_smoke --size 64 --epochs 3 --batch_size 4
 - **Code:** MIT (see [LICENSE](LICENSE)).
 - **Dataset:** Medical Segmentation Decathlon data is released under **CC-BY-SA 4.0**
   (per the [official website](https://medicaldecathlon.com/)). The sample figures in
-  `docs/figures/` are derived from it and are shared under the same terms.
+  `docs/` are derived from it and are shared under the same terms.
 
 ## Citation
 
