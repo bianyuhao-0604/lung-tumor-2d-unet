@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    name: Smoke test (CPU, dummy data)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU-only PyTorch
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install project dependencies
+        run: pip install -r requirements.txt
+
+      # ---------- data ----------
+      - name: Generate dummy MSD-style data
+        run: python make_dummy_data.py --out data/smoke --cases 14
+
+      - name: Contract checks (on-the-fly dataset)
+        run: python verify_extra.py --root data/smoke --size 64
+
+      # ---------- on-the-fly training path ----------
+      - name: Train 1 epoch (on-the-fly mode, CPU)
+        run: python train.py --data_root data/smoke --epochs 1 --batch_size 4 --size 64 --val_cases 4 --no_amp
+
+      # ---------- offline slicing + fast path ----------
+      - name: Offline 3D-to-2D slicing
+        run: python prepare_slices.py --data_root data/smoke --out data/smoke_slices --size 64 --val_cases 4
+
+      - name: Contract checks (prepared dataset)
+        run: python verify_extra.py --root data/smoke --size 64 --prepared data/smoke_slices
+
+      - name: Train 1 epoch (prepared fast mode, CPU)
+        run: python train.py --prepared data/smoke_slices --epochs 1 --batch_size 4 --no_amp
+
+      # ---------- evaluation ----------
+      - name: Per-slice inference + evaluation
+        run: python infer_eval.py --prepared data/smoke_slices --ckpt data/checkpoints/best.pth --out data/preds
+
+      - name: Regenerate README figures
+        run: python make_figures.py --log data/checkpoints/train_log.txt --csv data/preds/dice_per_slice.csv --out docs/figures
