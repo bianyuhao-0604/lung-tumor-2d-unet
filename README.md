@@ -11,6 +11,10 @@ The repository ships an offline slice-preprocessing stage that makes training **
 a per-slice evaluation protocol that matches training-time metrics exactly, and an honest
 failure analysis of where a small 2D baseline breaks down.
 
+<p align="center">
+  <img src="docs/figures/method_overview.png" alt="Method overview — 2D U-Net for per-slice lung tumor segmentation" width="830">
+</p>
+
 ## Results
 
 **Validation set: 10 held-out cases (350 axial slices, 1:1 tumor/empty), metric = per-slice Dice (macro), threshold 0.5.**
